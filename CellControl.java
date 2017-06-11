@@ -144,6 +144,8 @@ public class CellControl extends Control implements Constants{
 	
 	}
 	
+	/**************** METHOD move START ******************/
+	
 	/* Method to move pieces when they are able to move */
 	/* Method Description:
 	 * This method assumes that this cell is going to be placed pieces
@@ -194,7 +196,7 @@ public class CellControl extends Control implements Constants{
 										setState(UNSELECTED);
 										b.getLogic().nextPlayer(getType());
 									
-									} else { // If the two next-to pieces are not straight with this object
+									} else { // If the two surrounding pieces are not straight with this object
 										/* This means this object is not a straight line with those
 										 * then process another two-pieces movement
 										 */
@@ -217,8 +219,12 @@ public class CellControl extends Control implements Constants{
 									}
 						} else { // Three pieces movement
 							if (getSurr(x).selectedPiece(0) != null)
+								/*
+								 * (selectedPizPos(0) == getSurr(x).selectedPizPos(0) means that
+								 * if this and three selected pieces are form one line.
+								 */
 								if (selectedPizPos(0) == getSurr(x).selectedPizPos(0) &
-								getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizDirc(0, getSurr(x))) {
+										getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizPos(0, getSurr(x))) {
 									
 									setType(getSurr(x).getType());
 									
@@ -231,6 +237,29 @@ public class CellControl extends Control implements Constants{
 									
 									b.getLogic().nextPlayer(getType());
 								
+								} else if (selectedPizPos(0) != getSurr(x).selectedPizPos(0) && 
+										getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizPos(0, getSurr(x)) ) {
+									int tarIndex = reverse(selectedPizPos(0));
+									if (getSurr(x).selectedPiece(0).getSurr(tarIndex) != null &&
+											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex) != null) {
+										//System.out.println(tarIndex);
+										if (getSurr(x).selectedPiece(0).getSurr(tarIndex).getType() == EMPTY && 
+												getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex).getType() == EMPTY) {
+											int currentPlayer = b.getLogic().getCurrentPlayer();
+											
+											/* Move pieces or set new types for those */
+											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex).setType(currentPlayer);
+											getSurr(x).selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
+											selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
+											
+											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).setType(EMPTY);
+											getSurr(x).selectedPiece(0).setType(EMPTY);
+											selectedPiece(0).setType(EMPTY);
+											
+											b.getLogic().nextPlayer(currentPlayer);
+											
+										}
+									}
 								}
 						}
 					}
@@ -290,17 +319,36 @@ public class CellControl extends Control implements Constants{
 			//return -1;
 	}
 	
-	private int selectedPizDirc(int index, CellControl c) {
+	/* Private method to return surrounding selected piece's position */
+	/* This method bascially is similar to the previous one 
+	 * Except it takes the CellControl as an argument for checking ...
+	 */
+	private int selectedPizPos(int index, CellControl c) {
 		if (index != 6)
 			if (getSurr(index) == this.selectedPiece(0, c) &
-				getSurr(index) != c)
+				getSurr(index) != c) // this line is what i want to talk about..
 			return index;
 		else
-			return selectedPizDirc(index+1, c);
+			return selectedPizPos(index+1, c);
 		else
 			return -1;
 	}
-	/********************* END OF MOVEMENT METHODS *********************/
+	
+	private int reverse(int index) {
+		if (index == 0)
+			return 3;
+		else if (index == 1)
+			return 4;
+		else if (index == 2)
+			return 5;
+		else if (index == 3)
+			return 0;
+		else if (index == 4)
+			return 1;
+		else
+			return 2;
+	}
+	/********************* METHOD move END *********************/
 	
 	/* Method to set state for an non-empty cell when Pressed */
 	public void setStateWhenPressed() {
