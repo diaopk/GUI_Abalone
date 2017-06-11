@@ -125,18 +125,19 @@ public class CellControl extends Control implements Constants{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
-				setAtrbs((int)newValue, getState());
+				setAttributes((int)newValue, getState());
 			}
 			
 		});
 		
 		/* When a piece is hover */
+		/* Set hovered piece's colour */
 		getCircle().hoverProperty().addListener(new ChangeListener<Object>() {
 
 			@Override
 			public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
 				// TODO Auto-generated method stub
-				setPizHoverColor(getType(), getState());
+				setPieceHoverColor(getType(), getState());
 			}
 			
 		});
@@ -144,13 +145,19 @@ public class CellControl extends Control implements Constants{
 	}
 	
 	/* Method to move pieces when they are able to move */
-	/* This function moves this piece depanding on three conditions
+	/* Method Description:
+	 * This method assumes that this cell is going to be placed pieces
+	 * and check surrounding pieces to find the selected one.
+	 * If found selected pieces it then is capable of being placed pieces.
+	 */
+	/* This method move(place) piece depanding on three conditions
 	 * 1. One-piece movement: assume this cell is the cell is going to be placed a piece
 	 * check surrounding cells for selected piece. If found and this cell is clicked then place a piece that is selected
-	 * 2. Two-piece movement:
+	 * 2. Two-piece movement: Two-pieces move straight and not straight..i don't know how to say it
 	 * 3. Three-piece movement: 
 	 */
 	public void move() {
+		/* Normal checking from line 161 to line 165 */
 		if (getType() == EMPTY & getState() == MOVABLE)
 			for (int x = 0; x < 6; x++)
 				if (getSurr(x) != null)
@@ -166,23 +173,23 @@ public class CellControl extends Control implements Constants{
 						
 						} else if (b.getLogic().numPizSelected() == 2) { // Two pieces movement
 							// If the surrounding piece is selected and is not null
-							if (getSurr(x).selectedPiz(0) != null)
+							if (getSurr(x).selectedPiece(0) != null)
 								// If two next-to pieces are the same type and both selected
-								if (getSurr(x).selectedPiz(0).getType() == getSurr(x).getType())
+								if (getSurr(x).selectedPiece(0).getType() == getSurr(x).getType())
 									/* Assume this object(cell) is going to be placed with a new piece
 									 * If the surrounding piece of this cell is selected 
 									 * and that surrounding piece's surrounding is also selected
 									 * and these two surrounding are the same direction from this cell
 									 */
-									if (selectedPizDirc(0) == getSurr(x).selectedPizDirc(0)) {
+									if (selectedPizPos(0) == getSurr(x).selectedPizPos(0)) {
 										// Two-pieces straight movement
 										//System.out.println(selectedPizDirc(0));
 										//System.out.println("GetSurr.selectedPizDirc(0): " + getSurr(x).selectedPizDirc(0));
 										setType(getSurr(x).getType());
-										getSurr(x).setType(getSurr(x).selectedPiz(0).getType());
-										getSurr(x).selectedPiz(0).setType(EMPTY);
+										getSurr(x).setType(getSurr(x).selectedPiece(0).getType());
+										getSurr(x).selectedPiece(0).setType(EMPTY);
 										
-										getSurr(x).selectedPiz(0).setState(UNSELECTED);
+										getSurr(x).selectedPiece(0).setState(UNSELECTED);
 										getSurr(x).setState(UNSELECTED);
 										setState(UNSELECTED);
 										b.getLogic().nextPlayer(getType());
@@ -195,32 +202,32 @@ public class CellControl extends Control implements Constants{
 										 * ob[getSurr(x).selectedPizDirc(0)].get().getType() means 
 										 * the type of the surrounding piece of this cell
 										 */
-										if (ob[getSurr(x).selectedPizDirc(0)].get() != null &
-												ob[getSurr(x).selectedPizDirc(0)].get().getType() != selectedPiz(0).getType() &&
-												ob[getSurr(x).selectedPizDirc(0)].get().getType() == EMPTY) {
+										if (ob[getSurr(x).selectedPizPos(0)].get() != null &
+												ob[getSurr(x).selectedPizPos(0)].get().getType() != selectedPiece(0).getType() &&
+												ob[getSurr(x).selectedPizPos(0)].get().getType() == EMPTY) {
 											
 											setType(getSurr(x).getType());
-											ob[getSurr(x).selectedPizDirc(0)].get().setType(getSurr(x).selectedPiz(0).getType());
+											ob[getSurr(x).selectedPizPos(0)].get().setType(getSurr(x).selectedPiece(0).getType());
 											getSurr(x).setType(EMPTY);
-											getSurr(x).selectedPiz(0).setType(EMPTY);
+											getSurr(x).selectedPiece(0).setType(EMPTY);
 											
 											b.getLogic().nextPlayer(getType());
 										
 										}
 									}
 						} else { // Three pieces movement
-							if (getSurr(x).selectedPiz(0) != null)
-								if (selectedPizDirc(0) == getSurr(x).selectedPizDirc(0) &
-								getSurr(x).selectedPizDirc(0) == getSurr(x).selectedPiz(0).selectedPizDirc(0, getSurr(x))) {
+							if (getSurr(x).selectedPiece(0) != null)
+								if (selectedPizPos(0) == getSurr(x).selectedPizPos(0) &
+								getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizDirc(0, getSurr(x))) {
 									
 									setType(getSurr(x).getType());
 									
-									getSurr(x).setType(getSurr(x).selectedPiz(0).getType());
+									getSurr(x).setType(getSurr(x).selectedPiece(0).getType());
 									getSurr(x).setState(UNSELECTED);
 									
-									getSurr(x).getSurr(getSurr(x).selectedPizDirc(0)).setType(getSurr(x).selectedPiz(0).selectedPiz(0).getType());
+									getSurr(x).getSurr(getSurr(x).selectedPizPos(0)).setType(getSurr(x).selectedPiece(0).selectedPiece(0).getType());
 								
-									getSurr(x).selectedPiz(0).selectedPiz(0).setType(EMPTY);
+									getSurr(x).selectedPiece(0).selectedPiece(0).setType(EMPTY);
 									
 									b.getLogic().nextPlayer(getType());
 								
@@ -232,10 +239,10 @@ public class CellControl extends Control implements Constants{
 	/********** FOLLOWING FOUR METHODS FOR ASSISTING IN MOVEMENTS **********/
 	
 	/* Private method to return surrounding selected piece */
-	private CellControl selectedPiz(int index) {
+	private CellControl selectedPiece(int index) {
 		/* There are 6 pieces surrounding this cell
-		 * If reach the last one surrounding piece
-		 * then meaning no selected piece, return null
+		 * If reach the last surrounding piece
+		 * then meaning no selected piece, return null, which means no other selected piece
 		 * If not reach the last one then call the function itself until reach the last one
 		 */
 		if (index != 6) {
@@ -243,43 +250,49 @@ public class CellControl extends Control implements Constants{
 				if (this.getSurr(index).getState() == SELECTED)
 					return this.getSurr(index);
 				else
-					return selectedPiz(index+1);
+					return selectedPiece(index+1);
 			else
-				return selectedPiz(index+1);
+				return selectedPiece(index+1);
 		} else
 			return null;
 	}
 	
-	private CellControl selectedPiz(int index, CellControl c) {
+	private CellControl selectedPiece(int index, CellControl c) {
 		if (index != 6) {
 			if (this.getSurr(index) != null)
 				if (this.getSurr(index).getState() == SELECTED &
 						getSurr(index) != c)
 					return getSurr(index);
 				else
-					return selectedPiz(index+1, c);
+					return selectedPiece(index+1, c);
 			else 
-				return selectedPiz(index+1, c);
+				return selectedPiece(index+1, c);
 		} else
 			return null;
 	}
 	
 	/* Private method to return the surrounding selected piece's position */
-	private int selectedPizDirc(int index) {
-		//if (this.selectedPiz(0) != null) {
-		// If the surrounding piece is selected
-		//if (getSurr(index) == selectedPiz(0))
-		if (getSurr(index).getState() == SELECTED)
-				return index;
-			else
-				return selectedPizDirc(index+1);
-		/*} else 
-			return -1;*/
+	private int selectedPizPos(int index) {
+		/* If the index reaches the last one(6), return negative value
+		 * If there is a null cell surrounding this object,
+		 * plus one and continue this function.
+		 * Until find a selected piece.
+		 */
+		//if (index == 6) {
+			if (getSurr(index) != null) {
+				if (getSurr(index).getState() == SELECTED)
+					return index;
+				else
+					return selectedPizPos(index+1);
+			} else 
+				return selectedPizPos(index+1);
+		//} else
+			//return -1;
 	}
 	
 	private int selectedPizDirc(int index, CellControl c) {
 		if (index != 6)
-			if (getSurr(index) == this.selectedPiz(0, c) &
+			if (getSurr(index) == this.selectedPiece(0, c) &
 				getSurr(index) != c)
 			return index;
 		else
@@ -318,21 +331,21 @@ public class CellControl extends Control implements Constants{
 	private void setStateAtrbs(int newState, int oldValue) {
 		switch (newState) {
 			case UNSELECTED: // If Changes to UNSELECTED
-				setAtrbs(getType(), newState);
+				setAttributes(getType(), newState);
 				hex.setFill(Color.DIMGRAY);
 				changeNumSltedPiz(oldValue);
 				setSurrPizs(UNSELECTED);
 				break;
 				
 			case SELECTED: // If changes to SELECTED
-				setAtrbs(getType(), newState);
+				setAttributes(getType(), newState);
 				hex.setFill(Color.LIGHTGRAY);
 				changeNumSltedPiz(oldValue);
 				setSurrPizs(SELECTED);
 				
 				break;
 			case MOVABLE: // If changes to MOVABLE
-				setAtrbs(getType(), newState);
+				setAttributes(getType(), newState);
 				//getPiece().setPizHoverColor(Color.DEEPPINK, Color.HOTPINK);
 				
 				break;
@@ -543,11 +556,13 @@ public class CellControl extends Control implements Constants{
 		}
 	}
 	
-	/***************** PIECES METHODS ******************/
+	/***************** THE PIECE'S METHODS ******************/
+	/* Pieces' methods are about changing pieces' colour */
 	
 	/* Method to change piece attributes 
-	 * when the piece's type changes on the where the cell's state changes */
-	public void setAtrbs(int pieceType, int state) {
+	 * when the piece's type changes on the where the cell's state changes
+	 */
+	public void setAttributes(int pieceType, int state) {
 		switch(pieceType) {
 			case EMPTY:
 				if (state == MOVABLE)
@@ -570,7 +585,7 @@ public class CellControl extends Control implements Constants{
 	}
 	
 	/* Method to set hover color */
-	public void setPizHoverColor(int type, int state) {
+	public void setPieceHoverColor(int type, int state) {
 		
 		switch (type) {
 		case BLACK:
