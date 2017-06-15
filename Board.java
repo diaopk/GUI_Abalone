@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 import javafx.scene.shape.Polygon;
 import javafx.scene.layout.Pane;
@@ -103,6 +103,7 @@ public class Board extends Pane implements Constants{
 		for (int i = 0; i <= 8; i++)
 			for (int j = 0; j <= 8; j++) {
 			if (cc[i][j] == null) { // Display the game grid
+				System.out.println("Board resize IF calls");
 				if (i == 0 & j>1 & j<7 |
 						i == 1 & j>0 & j<7 |
 						i == 2 & j>0 & j<8 |
@@ -128,6 +129,7 @@ public class Board extends Pane implements Constants{
 					cc[i][j].setType(BLACK);
 				
 			} else { // If cell are not null
+				System.out.println("Board resize ELSE calls");
 				cc[i][j].setRotate(90);
 				cc[i][j].resize(2*subS, subS);
 				cc[i][j].relocate(subS*Math.sqrt(3.0)*j, subS*i*3/2);

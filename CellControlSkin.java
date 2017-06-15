@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 /* Basic implementation of a skin */
 

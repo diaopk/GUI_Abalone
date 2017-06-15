@@ -13,4 +13,4 @@
  * Now you can move any way you want under the game rule.
  * Any piece can be able to move when selected or clicked.
  *****************************************************************/
-package Main;
+package GUI_Abalone;

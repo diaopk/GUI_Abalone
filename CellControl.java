@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 import javafx.scene.control.Control;
 import javafx.scene.input.MouseEvent;
@@ -237,12 +237,14 @@ public class CellControl extends Control implements Constants{
 									
 									b.getLogic().nextPlayer(getType());
 								
+								/* If the cell to move does not form a line with those three pieces */
 								} else if (selectedPizPos(0) != getSurr(x).selectedPizPos(0) && 
 										getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizPos(0, getSurr(x)) ) {
 									int tarIndex = reverse(selectedPizPos(0));
 									if (getSurr(x).selectedPiece(0).getSurr(tarIndex) != null &&
 											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex) != null) {
-										//System.out.println(tarIndex);
+										System.out.println("index: " + selectedPizPos(0));
+										System.out.println("tarIndex: " + tarIndex);
 										if (getSurr(x).selectedPiece(0).getSurr(tarIndex).getType() == EMPTY && 
 												getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex).getType() == EMPTY) {
 											int currentPlayer = b.getLogic().getCurrentPlayer();
@@ -252,6 +254,7 @@ public class CellControl extends Control implements Constants{
 											getSurr(x).selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
 											selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
 											
+											/* Set those original cells to empty type */
 											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).setType(EMPTY);
 											getSurr(x).selectedPiece(0).setType(EMPTY);
 											selectedPiece(0).setType(EMPTY);

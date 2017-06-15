@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 //This class allows you to add a timer object to your application. 
 //The timers "start" and "pause" method should be called from an appropriate location.
 

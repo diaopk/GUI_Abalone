@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 public interface Constants {
 	/* Players */

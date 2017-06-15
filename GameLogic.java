@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

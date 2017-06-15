@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

@@ -1,4 +1,4 @@
-package Main;
+package GUI_Abalone;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
