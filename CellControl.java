@@ -20,7 +20,7 @@ public class CellControl extends Control implements Constants{
 	private Board b;
 	private Polygon hex;
 	private final int sides = 6;
-	private ObjectProperty<CellControl>[] ob; // Array of nodes surrounding this node
+	private ObjectProperty<CellControl>[] cell; // Array of nodes surrounding this node
 	private int[] index; // Index in the game grid
 	private Circle piece;
 	
@@ -37,7 +37,7 @@ public class CellControl extends Control implements Constants{
 		b = board;
 		hex = new Polygon();
 		state = new SimpleIntegerProperty(UNSELECTED);
-		ob = (ObjectProperty<CellControl>[]) new ObjectProperty[6]; 
+		cell = (ObjectProperty<CellControl>[]) new ObjectProperty[6]; 
 		type = new SimpleIntegerProperty(player);
 		piece = new Circle();
 		
@@ -49,7 +49,7 @@ public class CellControl extends Control implements Constants{
 	
 		/* Initialise 6 surrounding cells' state */
 		for (int i = 0; i < 6; i++)
-			ob[i] = new SimpleObjectProperty<CellControl>(null);
+			cell[i] = new SimpleObjectProperty<CellControl>(null);
 		
 		this.setSkin(new CellControlSkin(this));
 		
@@ -152,7 +152,7 @@ public class CellControl extends Control implements Constants{
 	 * and check surrounding pieces to find the selected one.
 	 * If found selected pieces it then is capable of being placed pieces.
 	 */
-	/* This method move(place) piece depanding on three conditions
+	/* This method move(place) piece depending on three conditions
 	 * 1. One-piece movement: assume this cell is the cell is going to be placed a piece
 	 * check surrounding cells for selected piece. If found and this cell is clicked then place a piece that is selected
 	 * 2. Two-piece movement: Two-pieces move straight and not straight..i don't know how to say it
@@ -165,6 +165,7 @@ public class CellControl extends Control implements Constants{
 				if (getSurr(x) != null)
 					if (getSurr(x).getState() == SELECTED &
 						getSurr(x).getType() == b.getLogic().getCurrentPlayer()) {
+						/* getSurr(x) is the most surrounding-selected piece */
 						
 						if (b.getLogic().numPizSelected() == 1) { // One piece movement
 							setType(getSurr(x).getType());
@@ -204,12 +205,12 @@ public class CellControl extends Control implements Constants{
 										 * ob[getSurr(x).selectedPizDirc(0)].get().getType() means 
 										 * the type of the surrounding piece of this cell
 										 */
-										if (ob[getSurr(x).selectedPizPos(0)].get() != null &
-												ob[getSurr(x).selectedPizPos(0)].get().getType() != selectedPiece(0).getType() &&
-												ob[getSurr(x).selectedPizPos(0)].get().getType() == EMPTY) {
+										if (cell[getSurr(x).selectedPizPos(0)].get() != null &
+												cell[getSurr(x).selectedPizPos(0)].get().getType() != selectedPiece(0).getType() &&
+												cell[getSurr(x).selectedPizPos(0)].get().getType() == EMPTY) {
 											
 											setType(getSurr(x).getType());
-											ob[getSurr(x).selectedPizPos(0)].get().setType(getSurr(x).selectedPiece(0).getType());
+											cell[getSurr(x).selectedPizPos(0)].get().setType(getSurr(x).selectedPiece(0).getType());
 											getSurr(x).setType(EMPTY);
 											getSurr(x).selectedPiece(0).setType(EMPTY);
 											
@@ -238,29 +239,65 @@ public class CellControl extends Control implements Constants{
 									b.getLogic().nextPlayer(getType());
 								
 								/* If the cell to move does not form a line with those three pieces */
-								} else if (selectedPizPos(0) != getSurr(x).selectedPizPos(0) && 
-										getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizPos(0, getSurr(x)) ) {
-									int tarIndex = reverse(selectedPizPos(0));
-									if (getSurr(x).selectedPiece(0).getSurr(tarIndex) != null &&
-											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex) != null) {
-										System.out.println("index: " + selectedPizPos(0));
-										System.out.println("tarIndex: " + tarIndex);
-										if (getSurr(x).selectedPiece(0).getSurr(tarIndex).getType() == EMPTY && 
-												getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex).getType() == EMPTY) {
-											int currentPlayer = b.getLogic().getCurrentPlayer();
+								} else if (selectedPizPos(0) != getSurr(x).selectedPizPos(0)) {
+									/*
+									 * the selectedPiece(0) is the head, middle and tail one
+									 * So we need to find out the index(or position) of the selectedPiece(0)
+									 */
+									int target = reverse(selectedPizPos(0));
+									int currentPlayer = b.getLogic().getCurrentPlayer();
+									//System.out.println("the target index is: " + target);
+									//System.out.println("Three piece move");
+									
+									/* Condition 1 and 2 */
+									if (getSurr(x).selectedPiece(0).selectedPiece(0, getSurr(x)) != null) { // 0-1-1 and 1-1-0
+										CellControl piece1 = getSurr(x);
+										CellControl piece2 = getSurr(x).selectedPiece(0);
+										CellControl piece3 = getSurr(x).selectedPiece(0).selectedPiece(0, getSurr(x));
+										
+										if (piece1.selectedPizPos(0) == piece2.selectedPizPos(0, piece1) &&
+												piece2.getSurr(target) != null && piece3.getSurr(target) != null &&
+												piece1.getSurr(target).getType() == EMPTY &&
+												piece2.getSurr(target).getType() == EMPTY &&
+												piece3.getSurr(target).getType() == EMPTY) {
+											//System.out.println("Condition 1 and 2");
+											/* Setup for movement */
+											piece3.getSurr(target).setType(currentPlayer);
+											piece2.getSurr(target).setType(currentPlayer);
+											this.setType(currentPlayer);
 											
-											/* Move pieces or set new types for those */
-											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).getSurr(tarIndex).setType(currentPlayer);
-											getSurr(x).selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
-											selectedPiece(0).getSurr(tarIndex).setType(currentPlayer);
-											
-											/* Set those original cells to empty type */
-											getSurr(x).selectedPiece(0).selectedPiece(0, selectedPiece(0)).setType(EMPTY);
-											getSurr(x).selectedPiece(0).setType(EMPTY);
-											selectedPiece(0).setType(EMPTY);
+											piece3.setType(EMPTY);
+											piece2.setType(EMPTY);
+											piece1.setType(EMPTY);
 											
 											b.getLogic().nextPlayer(currentPlayer);
 											
+											break;
+										}
+										
+									/* Condition 3 */
+									} else if (getSurr(x).selectedPiece(0, getSurr(0).selectedPiece(0)) != null) { // 1-0-1 
+										CellControl piece1 = getSurr(x);
+										CellControl piece2 = getSurr(x).selectedPiece(0);
+										CellControl piece3 = getSurr(x).selectedPiece(0, piece2);
+										if (piece2.selectedPizPos(0) == piece1.selectedPizPos(0, piece2) &&
+												piece2.getSurr(target) != null && piece3.getSurr(target) != null &&
+												piece1.getSurr(target).getType() == EMPTY &&
+												piece2.getSurr(target).getType() == EMPTY &&
+												piece3.getSurr(target).getType() == EMPTY) {
+											//System.out.println("Condition 3");
+											/* Setup for movement */
+											piece2.getSurr(target).setType(currentPlayer);
+											piece3.getSurr(target).setType(currentPlayer);
+											this.setType(currentPlayer);
+											
+											piece3.setType(EMPTY);
+											piece2.setType(EMPTY);
+											piece1.setType(EMPTY);
+											
+											b.getLogic().nextPlayer(currentPlayer);
+											
+											break;
 										}
 									}
 								}
@@ -718,25 +755,25 @@ public class CellControl extends Control implements Constants{
 	 * 			(cell(5))	(cell(4))
 	 * 
 	 ************************************************/
-	public ObjectProperty<CellControl> surrCellProperty(int i) { return ob[i]; }
+	public ObjectProperty<CellControl> surrCellProperty(int i) { return cell[i]; }
 	
-	public CellControl getSurr(int x) { return ob[x].get(); }
+	public CellControl getSurr(int x) { return cell[x].get(); }
 	
 	/* Methods to return nodes */
-	public CellControl left() { return ob[0].get(); }
-	public CellControl topLeft() { return ob[1].get(); }
-	public CellControl topRight() { return ob[2].get(); }
-	public CellControl right() { return ob[3].get(); }
-	public CellControl bottomRight() { return ob[4].get(); }
-	public CellControl bottomLeft() { return ob[5].get(); }
+	public CellControl left() { return cell[0].get(); }
+	public CellControl topLeft() { return cell[1].get(); }
+	public CellControl topRight() { return cell[2].get(); }
+	public CellControl right() { return cell[3].get(); }
+	public CellControl bottomRight() { return cell[4].get(); }
+	public CellControl bottomLeft() { return cell[5].get(); }
 	
 	/* Methods to set these nodes */
-	public void setLeft(CellControl c) { ob[0].set(c); }
-	public void setTopLeft(CellControl c) { ob[1].set(c); }
-	public void setTopRight(CellControl c) { ob[2].set(c); }
-	public void setRight(CellControl c) { ob[3].set(c); }
-	public void setBottomRight(CellControl c) { ob[4].set(c); }
-	public void setBottomLeft(CellControl c) { ob[5].set(c); }
+	public void setLeft(CellControl c) { cell[0].set(c); }
+	public void setTopLeft(CellControl c) { cell[1].set(c); }
+	public void setTopRight(CellControl c) { cell[2].set(c); }
+	public void setRight(CellControl c) { cell[3].set(c); }
+	public void setBottomRight(CellControl c) { cell[4].set(c); }
+	public void setBottomLeft(CellControl c) { cell[5].set(c); }
 
 }
 
