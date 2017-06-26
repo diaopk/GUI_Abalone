@@ -32,7 +32,6 @@ public class CellControl extends Control implements Constants{
 	
 	@SuppressWarnings("unchecked")
 	CellControl(int player, Board board) {
-		
 		/* Initialise them */
 		b = board;
 		hex = new Polygon();
@@ -717,12 +716,14 @@ public class CellControl extends Control implements Constants{
 		super.resize(width, height);
 		piece.setRadius((width*Math.sqrt(3.0)/2)/2 - 5);
 		hex.getPoints().addAll(makeVertices(width/2, sides));
+		//System.out.println("CellControl resize() call");
 	}
 	
 	@Override
 	public void relocate(double x, double y) {
 		super.relocate(x, y);
 		hex.relocate(x, y); piece.relocate(x, y);
+		//System.out.println("CellControl relocate() call");
 	}
 	
 
@@ -757,6 +758,7 @@ public class CellControl extends Control implements Constants{
 	 ************************************************/
 	public ObjectProperty<CellControl> surrCellProperty(int i) { return cell[i]; }
 	
+	/* Method to retrieve the surrounding cells */
 	public CellControl getSurr(int x) { return cell[x].get(); }
 	
 	/* Methods to return nodes */

@@ -25,11 +25,11 @@ public class Board extends Pane implements Constants{
 		hexagon = new Polygon();
 		cc = new CellControl[9][9];
 		
-		/* Initlise 9 * 9 cells */
-		for (int i = 0; i <= 8; i++)
+		/* Initialise 9 * 9 cells */
+		/*for (int i = 0; i <= 8; i++)
 			for (int j = 0; j <= 8; j++)
 				cc[i][j] = null;
-		
+		*/
 		gl = new GameLogic(this);
 		
 		hexagon.setFill(Color.DIMGRAY);
@@ -94,7 +94,7 @@ public class Board extends Pane implements Constants{
 		s = width * 1/2;
 		subS = width* Math.sqrt(3.0)/27;
 		
-		hexagon.getPoints().addAll(makeVertices(s, sides));
+		//hexagon.getPoints().addAll(makeVertices(s, sides));
 		
 		/* Place cellControls to display a game grid of abalone */
 		/* The following calculates the positions of each cell,
@@ -116,20 +116,23 @@ public class Board extends Pane implements Constants{
 					cc[i][j] = new CellControl(EMPTY, this);
 					cc[i][j].setIndex(i, j);
 					getChildren().add(cc[i][j]);
-				}
+					//System.out.println("("+i+", "+j+")");
+				} else
+					System.out.println("("+i+", "+j+")");
 				
 				if (i == 0 & j>1 & j<7 |
 						i == 1 & j>0 & j<7 |
 						i == 2 & j>2 & j<6) // Place white pieces
-					cc[i][j].setType(WHITE);
+					{cc[i][j].setType(WHITE);System.out.println("White: "+"("+i+", "+j+")");}
+				
 				
 				else if (i == 8 & j>1 & j<7 |
 						i == 7 & j>0 & j<7 |
 						i == 6 & j>2 & j<6) // Place black pieces
-					cc[i][j].setType(BLACK);
-				
+					{cc[i][j].setType(BLACK);System.out.println("Black: "+"("+i+", "+j+")");}
+				hexagon.getPoints().addAll(makeVertices(s, sides));
 			} else { // If cell are not null
-				System.out.println("Board resize ELSE calls");
+				//System.out.println("Board resize ELSE calls");
 				cc[i][j].setRotate(90);
 				cc[i][j].resize(2*subS, subS);
 				cc[i][j].relocate(subS*Math.sqrt(3.0)*j, subS*i*3/2);
