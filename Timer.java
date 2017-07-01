@@ -15,26 +15,29 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
-public class Timer extends Group {
+public class Timer extends Group implements Constants{
 
-	private static final Integer STARTTIME = 300; // set the start time as 300 seconds i.e. 5 mins
+	/* Timer attributes */
 	private Timeline timeline; // tracks the time
 	private Label timerLabel;  // displays the time
 	private Label playerLabel; // displays the player
 	private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME);  
 
 	public Timer(Abalone a, String playerLabelString){		
-		this.timerLabel = new Label(); 
-		this.playerLabel = new Label(playerLabelString);
-		this.getChildren().addAll(this.playerLabel, this.timerLabel);
+		timerLabel = new Label(); 
+		timerLabel.setId("label_timer");
+		playerLabel = new Label(playerLabelString);
+		getChildren().addAll(playerLabel, timerLabel);
+		
 		 // Bind the timerLabel text property to the timeSeconds property which means the label value updates as the timer counts.   
 		timerLabel.textProperty().bind(timeSeconds.asString());
-		//styling of the timer
-		timerLabel.setTextFill(Color.ALICEBLUE);
-		timerLabel.setStyle("-fx-font-size: 1.5em;"); 
+		
 		timeline = new Timeline();
+		
 		//setting the timer with the start value
-		timeSeconds.set(STARTTIME);
+		//timeSeconds.set(STARTTIME);
+		
+		
 		//specifing how the timer will opperate
 		timeline.getKeyFrames().add(
 				new KeyFrame(Duration.seconds(STARTTIME+1),
@@ -44,7 +47,7 @@ public class Timer extends Group {
 		timeline.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println("Player"+playerLabel.getText()+ " has run out of time");
+				//System.out.println("Player"+playerLabel.getText()+ " has run out of time");
 				
 				/* Turn to next player */
 				a.getBoard().getLogic().nextPlayer(a.getBoard().getLogic().getCurrentPlayer());
@@ -52,14 +55,19 @@ public class Timer extends Group {
 		});		
 	}
 
-	// call this method in the appropriate location to start the timer 
+	/* Method to start the timer */
 	public void start() {
 		timeline.playFromStart();
 	}
 
-	// call this method in the appropriate location to pause the timer
+	/* Method to pause the timer */
 	public void pause(){
 		timeline.pause();
+	}
+	
+	/* Method to reset the timer */
+	public void reset() { timeSeconds.set(STARTTIME);
+		timerLabel.textProperty().set(timeSeconds.toString());
 	}
 	
 }

@@ -69,8 +69,8 @@ public class GameLogic implements Constants{
 			
 		});
 		
-		countWhite.addListener(new CountChangeListener(WHITE, countWhite.get(), this));
-		countBlack.addListener(new CountChangeListener(BLACK, countBlack.get(), this));
+		//countWhite.addListener(new ChangeListener(WHITE, countWhite.get(), this));
+		//countBlack.addListener(new ChangeListener(BLACK, countBlack.get(), this));
 	}
 	
 	/* Method to set current_player to next player */

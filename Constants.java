@@ -11,5 +11,10 @@ public interface Constants {
 	final int SELECTED = 1;
 	final int MOVABLE = 2;
 	
+	/* Window size */
 	final double WINDOW_SIZE = 624.00;
+	
+	/* Timer */
+	final Integer STARTTIME = 300;
+
 }

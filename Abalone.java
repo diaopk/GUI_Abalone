@@ -65,8 +65,7 @@ public class Abalone extends Application implements Constants{
 		hb.setId("hb");
 		vb.setId("vb");
 		
-		/* Cannot update any data on the bar, 
-		 * it will make unexpected changes to the board and cells */
+		/* Start the timer */
 		t.start();
 		
 		hb.getChildren().addAll(bt1, lb1, c, lb2, t);

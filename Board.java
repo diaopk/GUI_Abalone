@@ -68,13 +68,12 @@ public class Board extends Pane implements Constants{
 				this.getChildren().remove(cc[i][j]);
 				cc[i][j] = null;
 			}
-		//getChildren().remove(hexagon);
 		
 		resize(WINDOW_SIZE, WINDOW_SIZE);
 		getLogic().setCurrentPlayer(BLACK);
 		getLogic().setNumPizSelected(0);
 		getLogic().setWinner(EMPTY);
-		//a.getTimer().start();
+		a.getTimer().reset();
 	}
 	
 	/* A stupid method */
