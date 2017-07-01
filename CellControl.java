@@ -52,6 +52,9 @@ public class CellControl extends Control implements Constants{
 		
 		this.setSkin(new CellControlSkin(this));
 		
+		/* Initialise the hex and piece */
+		hex.getPoints().addAll(makeVertices(b.getStage().getWidth()* Math.sqrt(3.0)/27, 6));
+		
 		/* Appearance setup */
 		hex.setStrokeWidth(0.1);
 		hex.setStroke(Color.BLACK);
@@ -105,19 +108,6 @@ public class CellControl extends Control implements Constants{
 			
 		});
 		
-		/* When piece is pressed */
-		/*getCircle().pressedProperty().addListener(new ChangeListener<Object>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Object> observable, Object oldValue,
-					Object newValue) {
-				// TODO Auto-generated method stub
-				//move();
-				
-			}
-			
-		});
-		*/
 		/* When piece's type changes */
 		getTypeProperty().addListener(new ChangeListener<Number>() {
 
@@ -715,15 +705,13 @@ public class CellControl extends Control implements Constants{
 	public void resize(final double width, final double height) {
 		super.resize(width, height);
 		piece.setRadius((width*Math.sqrt(3.0)/2)/2 - 5);
-		hex.getPoints().addAll(makeVertices(width/2, sides));
-		//System.out.println("CellControl resize() call");
+		hex.getPoints().setAll(makeVertices(b.getStage().getWidth()* Math.sqrt(3.0)/27, sides));
 	}
 	
 	@Override
 	public void relocate(double x, double y) {
 		super.relocate(x, y);
 		hex.relocate(x, y); piece.relocate(x, y);
-		//System.out.println("CellControl relocate() call");
 	}
 	
 
@@ -748,7 +736,7 @@ public class CellControl extends Control implements Constants{
 	public int getType() { return type.get(); }
 
 	
-	/* Methods to return nodes surrounding this node */
+	/* Methods to return nodes that are surrounding with this node */
 	/************************************************
 	 * 
 	 * 			(cell(1))	(cell(2))

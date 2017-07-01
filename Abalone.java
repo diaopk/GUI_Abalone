@@ -24,6 +24,11 @@ public class Abalone extends Application implements Constants{
 	private Scene scene;
 	
 	public void init() {
+		
+	}
+	
+	public void start(Stage primaryStage) {
+		/* Two layouts */
 		vb = new VBox();
 		hb = new HBox();
 		
@@ -41,7 +46,7 @@ public class Abalone extends Application implements Constants{
 		t = new Timer(this, "Play Time");
 		
 		/* A Board instance */
-		board = new Board(this);
+		board = new Board(this, primaryStage);
 		
 		/* Setup for the circle */
 		c.setRadius(9.0);
@@ -62,15 +67,12 @@ public class Abalone extends Application implements Constants{
 		
 		/* Cannot update any data on the bar, 
 		 * it will make unexpected changes to the board and cells */
-		//t.start();
+		t.start();
 		
 		hb.getChildren().addAll(bt1, lb1, c, lb2, t);
 		
 		vb.getChildren().addAll(hb, board);
 		
-	}
-	
-	public void start(Stage primaryStage) {
 		scene = new Scene(vb, WINDOW_SIZE, WINDOW_SIZE);
 		/* Get the css style sheet */
 		scene.getStylesheets().add(Abalone.class.getResource("Abalone.css").toExternalForm());

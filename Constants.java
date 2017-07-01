@@ -11,5 +11,5 @@ public interface Constants {
 	final int SELECTED = 1;
 	final int MOVABLE = 2;
 	
-	final double WINDOW_SIZE = 640.00;
+	final double WINDOW_SIZE = 624.00;
 }
