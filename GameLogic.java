@@ -18,12 +18,21 @@ public class GameLogic implements Constants{
 	private IntegerProperty current_player, countBlack, countWhite, winner;
 	private int num_piz_selected;
 	
+	/* Initialise the constructor */
 	GameLogic(Board b) {
 		board = b; 
+		
+		/* Initialise the number of those pieces are 14 */
 		countBlack = new SimpleIntegerProperty(14); 
 		countWhite = new SimpleIntegerProperty(14);
+		
+		/* Assume the first round is turn to black pieces */
 		current_player = new SimpleIntegerProperty(BLACK);
+		
+		/* Initialise the winner is empty */
 		winner = new SimpleIntegerProperty(EMPTY);
+		
+		
 		round = 1;
 		num_piz_selected = 0;
 		
@@ -33,10 +42,17 @@ public class GameLogic implements Constants{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
-				clearSelectedPizs();
+				/* Clean all the selected Pieces */
+				cleanSelectedPizs();
+				
+				/* reset the number of the selected pieces */
 				setNumPizSelected(0);
+				
+				/* Change the stateBar */
 				setBarState();
-				//b.abalone().getTimer().start();
+				
+				/* Reset the timer */
+				b.abalone().getTimer().reset();//b.abalone().getTimer().reset();
 			}
 			
 		});
@@ -92,7 +108,7 @@ public class GameLogic implements Constants{
 	}
 	
 	/* Method to clear up all pieces that are selected but are not the current player */
-	public void clearSelectedPizs() {
+	public void cleanSelectedPizs() {
 		for (int i = 0; i < 9; i++)
 			for (int j = 0; j < 9; j++)
 				if (board.getCell()[i][j] != null)
@@ -102,8 +118,10 @@ public class GameLogic implements Constants{
 					}
 	}
 	
+	/* Method to return the number of pieces that are selected */
 	public int numPizSelected() { return num_piz_selected; }
 	
+	/* Method to Set the number of selected pieces when pieces are selected */
 	public void setNumPizSelected(int number) {
 		if (number > 3 | number < 0)
 			System.out.println("Exceed the limit");
@@ -111,25 +129,27 @@ public class GameLogic implements Constants{
 			num_piz_selected = number;
 	}
 	
+	/* Method to Change the settings of the stateBar depending on the current player */
 	public void setBarState() {
 		switch (getCurrentPlayer()) {
+		/* If the current player is the black piece */
 		case BLACK:
 			board.abalone().barCircle().setFill(Color.BLACK);
 			board.abalone().barCircle().setStroke(Color.WHITE);
-			//board.abalone().barLabel_2().setText("Black Piece(s): "+countBlack.get());
+			board.abalone().barLabel_2().setText("Black Piece(s): "+countBlack.get());
 			break;
-			
+		
+			/* If the current player is the white player */
 		case WHITE:
 			board.abalone().barCircle().setFill(Color.WHITE);
 			board.abalone().barCircle().setStroke(Color.BLACK);
-			//board.abalone().barLabel_2().setText("White Piece(s): "+countWhite.get());
+			board.abalone().barLabel_2().setText("White Piece(s): "+countWhite.get());
 			break;
 			
 		default:
 			System.out.println("Abalone Error!");
 		}
-	
-	System.out.println(board.getLogic().getCurrentPlayer());
+		
 	}
 	
 	public int getRound() { return round; }

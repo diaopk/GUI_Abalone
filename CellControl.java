@@ -91,7 +91,7 @@ public class CellControl extends Control implements Constants{
 			public void handle(MouseEvent event) {
 				// TODO Auto-generated method stub
 				setStateWhenPressed();
-				move();
+				moveAndPush();
 			}
 			
 		});
@@ -102,8 +102,10 @@ public class CellControl extends Control implements Constants{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
+				/* oldValue is previous state */
+				/* newValue is changed state */
 				setStateAtrbs((int)newValue, (int)oldValue);
-			
+				
 			}
 			
 		});
@@ -114,7 +116,13 @@ public class CellControl extends Control implements Constants{
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
+				/* oldValue is previous type */
+				/* newValue is new type */
 				setAttributes((int)newValue, getState());
+				/*System.out.println("Type: "+getType()+"| old: "+oldValue);
+				System.out.println("         new: "+newValue+"\n");
+				/* I need to check pieces if they meet to be pushable below*/
+				//checkPieceForPush((int)newValue);
 			}
 			
 		});
@@ -133,7 +141,7 @@ public class CellControl extends Control implements Constants{
 	
 	}
 	
-	/**************** METHOD move START ******************/
+	/**************** METHOD move and push START ******************/
 	
 	/* Method to move pieces when they are able to move */
 	/* Method Description:
@@ -147,12 +155,12 @@ public class CellControl extends Control implements Constants{
 	 * 2. Two-piece movement: Two-pieces move straight and not straight..i don't know how to say it
 	 * 3. Three-piece movement: 
 	 */
-	public void move() {
+	public void moveAndPush() {
 		/* Normal checking from line 161 to line 165 */
-		if (getType() == EMPTY & getState() == MOVABLE)
+		if (/*getType() == EMPTYgetState() == PUSHABLE && */getState() == MOVABLE)
 			for (int x = 0; x < 6; x++)
 				if (getSurr(x) != null)
-					if (getSurr(x).getState() == SELECTED &
+					if (getSurr(x).getState() == SELECTED &&
 						getSurr(x).getType() == b.getLogic().getCurrentPlayer()) {
 						/* getSurr(x) is the most surrounding-selected piece */
 						
@@ -163,28 +171,41 @@ public class CellControl extends Control implements Constants{
 							setState(UNSELECTED);
 							b.getLogic().nextPlayer(getType());
 						
-						} else if (b.getLogic().numPizSelected() == 2) { // Two pieces movement
-							// If the surrounding piece is selected and is not null
+						} else if (b.getLogic().numPizSelected() == 2) { // Two pieces' movement and push
+							/* If the surrounding piece is selected and is not null */
 							if (getSurr(x).selectedPiece(0) != null)
-								// If two next-to pieces are the same type and both selected
+								/* If two next-to pieces are the same type and both selected */
 								if (getSurr(x).selectedPiece(0).getType() == getSurr(x).getType())
 									/* Assume this object(cell) is going to be placed with a new piece
 									 * If the surrounding piece of this cell is selected 
 									 * and that surrounding piece's surrounding is also selected
-									 * and these two surrounding are the same direction from this cell
+									 * and these two surrounding are the same direction with this cell
 									 */
+
+									/* Create Two local variables for easy use */
+									/* The piece most next to this cell */
+									CellControl piece1 = getSurr(x);
+									/* The piece most next to the piece1 */
+									CellControl piece2 = getSurr(x).selectedPiece(0);
+									
 									if (selectedPizPos(0) == getSurr(x).selectedPizPos(0)) {
-										// Two-pieces straight movement
-										//System.out.println(selectedPizDirc(0));
-										//System.out.println("GetSurr.selectedPizDirc(0): " + getSurr(x).selectedPizDirc(0));
-										setType(getSurr(x).getType());
-										getSurr(x).setType(getSurr(x).selectedPiece(0).getType());
-										getSurr(x).selectedPiece(0).setType(EMPTY);
+										/* Two-pieces straight movement or push */
 										
-										getSurr(x).selectedPiece(0).setState(UNSELECTED);
-										getSurr(x).setState(UNSELECTED);
-										setState(UNSELECTED);
-										b.getLogic().nextPlayer(getType());
+										
+										if (getType() == EMPTY) { // Move!
+											System.out.println(getType());
+											setType(piece1.getType());
+											piece1.setType(getSurr(x).selectedPiece(0).getType());
+											piece2.setType(EMPTY);
+											
+											piece2.setState(UNSELECTED);
+											piece1.setState(UNSELECTED);
+											setState(UNSELECTED);
+											b.getLogic().nextPlayer(getType());
+											
+										} else { // Push!
+											System.out.println("get it");
+										}
 									
 									} else { // If the two surrounding pieces are not straight with this object
 										/* This means this object is not a straight line with those
@@ -290,7 +311,7 @@ public class CellControl extends Control implements Constants{
 										}
 									}
 								}
-						}
+						} /* End of the Three pieces movement and push */
 					}
 	}
 	
@@ -377,23 +398,42 @@ public class CellControl extends Control implements Constants{
 		else
 			return 2;
 	}
-	/********************* METHOD move END *********************/
+	/********************* METHOD move and push END *********************/
 	
 	/* Method to set state for an non-empty cell when Pressed */
 	public void setStateWhenPressed() {
 		if (getType() != EMPTY)
+			/* Set to selected */
 			if (getState() == UNSELECTED & 
 				b.getLogic().getCurrentPlayer() == getType() &
 				b.getLogic().numPizSelected() < 3)
-				
 				setState(SELECTED);
 		
+			/* set to pushable */
+			/* If this cell's surrounding piece is the selected and 
+			 * that selected piece has another selected surrounding it with 
+			 * the same type, then check this whether it is empty of type. 
+			 * if so check for it's piece behind it . if is empty type then we
+			 * can set this cell to pushable state
+			 */
+			/*else if (getType() != b.getLogic().getCurrentPlayer() &&
+					getType() != EMPTY) {
+				System.out.println("first step");
+				if (b.getLogic().numPizSelected() == 2)
+					if (selectedPiece(0) != null)
+						if (selectedPiece(0).selectedPiece(0) != null)
+							if (selectedPizPos(0) == selectedPiece(0).selectedPizPos(0) &&
+							getSurr(reverse(selectedPizPos(0))).getType() == EMPTY)
+								setState(PUSHABLE);
+				}
+		
+			/* Set to unselected */
 			else if (getState() == SELECTED )
 				setState(UNSELECTED);
 				
 	}
 	
-	/* Method to set surrounding nodes' color when this node's state changes */
+	/* Method to set surrounding nodes' colour when this node's state changes */
 	private void setSurrPizs(int state) {
 		if (state == SELECTED)
 			setSurrPizsAtrbs(MOVABLE, SELECTED);
@@ -403,7 +443,7 @@ public class CellControl extends Control implements Constants{
 	
 	/* Private method to set attributes for a specific state */
 	/* When the cell's state changes, then call this function
-	 * changing corresponding attributes depanding on what state it changes to
+	 * changing corresponding attributes depending on what state it changes to
 	 */
 	private void setStateAtrbs(int newState, int oldValue) {
 		switch (newState) {
@@ -424,15 +464,17 @@ public class CellControl extends Control implements Constants{
 			case MOVABLE: // If changes to MOVABLE
 				setAttributes(getType(), newState);
 				//getPiece().setPizHoverColor(Color.DEEPPINK, Color.HOTPINK);
-				
+			
+			case PUSHABLE:
+				setAttributes(getType(), newState);
 				break;
 			default: // Debug info
-				System.out.println("Invaild State");
+				System.out.println("setStateAtrbs()");
 		}
 	}
 	
 	
-	/* Private method to be used for setting surrounding's node color and state
+	/* Private method to be used for setting surrounding's node colour and state
 	 * if they are EMPTY type*/
 	private void setSurrPizsAtrbs(int newState, int thisState) {
 		for (int x = 0; x <= 5; x++)
@@ -445,7 +487,7 @@ public class CellControl extends Control implements Constants{
 	/* Method used by setSurrPizsAtrbs() to check 
 	 * the passed surrounding cell's surrounding cell's state */
 	private boolean checkSurrState(CellControl c, int index, int state) {
-		if (state == UNSELECTED) {
+		if (state == UNSELECTED)
 			if (c.getSurr(index) != null) {
 				if (c.getSurr(index).getState() != SELECTED & index <= 5) {
 					if (index < 5) {
@@ -472,8 +514,43 @@ public class CellControl extends Control implements Constants{
 				 */
 				return true;
 			
-		} else // This object is set to selected
+		else // This object is set to selected
 			return true;
+	}
+	
+	/* Method to check pieces if they meet the requirement to be pushable */
+	public void checkPieceForPush(int newType) {
+		if (newType != EMPTY)
+			for (int x = 0; x < 6; x++)
+				if (getSurr(x) != null)
+					if (getSurr(x).getType() == getType())
+						if (getSurr(reverse(x)) != null)
+							if (getSurr(reverse(x)).getType() != EMPTY &&
+								getSurr(reverse(x)).getType() != b.getLogic().getCurrentPlayer())
+								if (getSurr(reverse(x)).getSurr(reverse(x)) == null) {
+									System.out.println("can be push out");
+								} else if (getSurr(reverse(x)).getSurr(reverse(x)).getType() == EMPTY) {
+									System.out.println("get it to push");
+									getSurr(x).setState(PUSHABLE);
+								}
+		/* new type is empty
+		 * means that there were non-empty pieces surrounding but now they are gone
+		 */
+		else {
+			System.out.println("They gone");
+		}
+				
+		/*if (thisCell.getType() != b.getLogic().getCurrentPlayer() &&
+				thisCell.getType() != EMPTY) {
+			System.out.println("first step");
+			if (b.getLogic().numPizSelected() == 2)
+				if (thisCell.selectedPiece(0) != null)
+					if (thisCell.selectedPiece(0).selectedPiece(0) != null)
+						if (thisCell.selectedPizPos(0) == thisCell.selectedPiece(0).selectedPizPos(0) &&
+							thisCell.getSurr(reverse(selectedPizPos(0))).getType() == EMPTY)
+							thisCell.setState(PUSHABLE);
+			}
+		*/
 	}
 
 	/* Method to change the number of selected piece
@@ -657,45 +734,58 @@ public class CellControl extends Control implements Constants{
 				break;
 				
 			default:
-				System.out.println("Invaild pieceType");
+				System.out.println("setAttributes()");
 		}
 	}
 	
-	/* Method to set hover color */
+	/* Method to set hover colour */
 	public void setPieceHoverColor(int type, int state) {
 		
 		switch (type) {
-		case BLACK:
-			if (piece.isHover())
-				piece.setFill(Color.gray(0.3));
-			else
-				piece.setFill(Color.BLACK);
-			break;
-		case WHITE: 
-			if (piece.isHover())
-				piece.setFill(Color.gray(0.75));
-			else
-				piece.setFill(Color.WHITE);
-			
-			break;
-			
-		case EMPTY:
-			if (state == MOVABLE) {
-				if (piece.isHover())
-					piece.setFill(Color.DEEPPINK);
-				else
-					piece.setFill(Color.HOTPINK);
-			} else {
-				if (piece.isHover())
-					piece.setFill(Color.web("#ff99aa"));
-				else
-					piece.setFill(Color.PINK);
-			}
-			
-			break;
-			
-		default :
-				System.out.println("Invaild type for setPizHoverColor()");
+			case BLACK:
+				if (state == PUSHABLE) {
+					if (piece.isHover())
+						piece.setFill(Color.AQUA);
+					else
+						piece.setFill(Color.BLACK);
+				} else {
+					if (piece.isHover())
+						piece.setFill(Color.gray(0.3));
+					else
+						piece.setFill(Color.BLACK);
+				}
+				break;
+			case WHITE:
+				if (state == PUSHABLE) {
+					if (piece.isHover())
+						piece.setFill(Color.BISQUE);
+					else
+						piece.setFill(Color.WHITE);
+				} else {
+					if (piece.isHover())
+						piece.setFill(Color.gray(0.75));
+					else
+						piece.setFill(Color.WHITE);
+				}
+				break;
+				
+			case EMPTY:
+				if (state == MOVABLE) {
+					if (piece.isHover())
+						piece.setFill(Color.DEEPPINK);
+					else
+						piece.setFill(Color.HOTPINK);
+				} else {
+					if (piece.isHover())
+						piece.setFill(Color.web("#ff99aa"));
+					else
+						piece.setFill(Color.PINK);
+				}
+				
+				break;
+				
+			default :
+					System.out.println("Invaild type for setPizHoverColor()");
 		}
 	}
 	

@@ -7,13 +7,13 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import javafx.animation.KeyValue;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.layout.HBox;
 
 public class Timer extends Group implements Constants{
 
@@ -22,12 +22,16 @@ public class Timer extends Group implements Constants{
 	private Label timerLabel;  // displays the time
 	private Label playerLabel; // displays the player
 	private IntegerProperty timeSeconds = new SimpleIntegerProperty(STARTTIME);  
-
-	public Timer(Abalone a, String playerLabelString){		
+	private HBox hb;
+	
+	public Timer(Abalone a){
 		timerLabel = new Label(); 
 		timerLabel.setId("label_timer");
-		playerLabel = new Label(playerLabelString);
-		getChildren().addAll(playerLabel, timerLabel);
+		playerLabel = new Label("Play Time:");
+		playerLabel.setId("label_player");
+		hb = new HBox();
+		hb.getChildren().addAll(playerLabel, timerLabel);
+		getChildren().add(hb);
 		
 		 // Bind the timerLabel text property to the timeSeconds property which means the label value updates as the timer counts.   
 		timerLabel.textProperty().bind(timeSeconds.asString());
@@ -35,14 +39,24 @@ public class Timer extends Group implements Constants{
 		timeline = new Timeline();
 		
 		//setting the timer with the start value
-		//timeSeconds.set(STARTTIME);
+		timeSeconds.set(STARTTIME);
 		
-		
-		//specifing how the timer will opperate
+		//specifying how the timer will opperate
 		timeline.getKeyFrames().add(
 				new KeyFrame(Duration.seconds(STARTTIME+1),
 						new KeyValue(timeSeconds, 0)));
 
+		/*timeSeconds.addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number oldVlaue, Number newValue) {
+				// TODO Auto-generated method stub
+				System.out.println(arg0);
+				//timerLabel.textProperty().bind();
+			}
+			
+		});*/
+		
 		// this method execute when the timer is finished    
 		timeline.setOnFinished(new EventHandler<ActionEvent>() {
 			@Override
@@ -52,7 +66,7 @@ public class Timer extends Group implements Constants{
 				/* Turn to next player */
 				a.getBoard().getLogic().nextPlayer(a.getBoard().getLogic().getCurrentPlayer());
 			}
-		});		
+		});
 	}
 
 	/* Method to start the timer */
@@ -66,8 +80,11 @@ public class Timer extends Group implements Constants{
 	}
 	
 	/* Method to reset the timer */
-	public void reset() { timeSeconds.set(STARTTIME);
-		timerLabel.textProperty().set(timeSeconds.toString());
+	public void reset() { 
+		/* Set back to the STARTTIME */
+		timeSeconds.set(STARTTIME);
+		/* Let timeline play again */
+		timeline.playFromStart();
 	}
 	
 }

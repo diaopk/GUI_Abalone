@@ -43,7 +43,7 @@ public class Abalone extends Application implements Constants{
 		c = new Circle();
 		
 		/* A Timer instance */
-		t = new Timer(this, "Play Time");
+		t = new Timer(this);
 		
 		/* A Board instance */
 		board = new Board(this, primaryStage);

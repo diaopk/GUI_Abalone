@@ -2,13 +2,10 @@ package GUI_Abalone;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.transform.Translate;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -93,7 +90,7 @@ public class Piece extends Group implements Constants{
 		}
 	}
 	
-	/* Method to set hover color */
+	/* Method to set hover colour */
 	public void setPizHoverColor(Color hoverColor, Color origion) {
 		
 		c.hoverProperty().addListener(new ChangeListener<Object>() {

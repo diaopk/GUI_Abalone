@@ -19,7 +19,7 @@ public class Board extends Pane implements Constants{
 	/* 9 * 9 cells */
 	private CellControl[][] cc;
 	private GameLogic gl;
-	private double s, subS;
+	private double subS;
 	private int sides = 6;
 	
 	Board(Abalone main, Stage stage) {
@@ -69,11 +69,22 @@ public class Board extends Pane implements Constants{
 				cc[i][j] = null;
 			}
 		
+		/* Resize the window */
 		resize(WINDOW_SIZE, WINDOW_SIZE);
+		/*getLogic().setWinner(EMPTY);
 		getLogic().setCurrentPlayer(BLACK);
 		getLogic().setNumPizSelected(0);
-		getLogic().setWinner(EMPTY);
 		a.getTimer().reset();
+		*/
+		if (getLogic().getCurrentPlayer() != BLACK)
+			getLogic().setCurrentPlayer(BLACK);
+		else {
+			/* Run GameLogic currentPlayer change code */
+			getLogic().setNumPizSelected(0);
+			getLogic().cleanSelectedPizs();
+			getLogic().setBarState();
+			a.getTimer().reset();
+		}
 	}
 	
 	/* A stupid method */
@@ -106,8 +117,7 @@ public class Board extends Pane implements Constants{
 		for (int i = 0; i <= 8; i++)
 			for (int j = 0; j <= 8; j++) {
 			if (cc[i][j] == null) { // Display the game grid
-				//System.out.println("Board resize IF calls");
-				if (i == 0 & j>1 & j<7 |
+								if (i == 0 & j>1 & j<7 |
 						i == 1 & j>0 & j<7 |
 						i == 2 & j>0 & j<8 |
 						i == 3 & j < 8 |
