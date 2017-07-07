@@ -182,15 +182,15 @@ public class CellControl extends Control implements Constants{
 									 * and these two surrounding are the same direction with this cell
 									 */
 
-									/* Create Two local variables for easy use */
-									/* The piece most next to this cell */
-									CellControl piece1 = getSurr(x);
-									/* The piece most next to the piece1 */
-									CellControl piece2 = getSurr(x).selectedPiece(0);
 									
 									if (selectedPizPos(0) == getSurr(x).selectedPizPos(0)) {
 										/* Two-pieces straight movement or push */
 										
+										/* Create Two local variables for easy use */
+										/* The piece most next to this cell */
+										CellControl piece1 = getSurr(x);
+										/* The piece most next to the piece1 */
+										CellControl piece2 = getSurr(x).selectedPiece(0);
 										
 										if (getType() == EMPTY) { // Move!
 											System.out.println(getType());
