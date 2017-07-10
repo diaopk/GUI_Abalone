@@ -157,7 +157,8 @@ public class CellControl extends Control implements Constants{
 	 */
 	public void moveAndPush() {
 		/* Normal checking from line 161 to line 165 */
-		if (/*getType() == EMPTY*/getState() == PUSHABLE ||getState() == MOVABLE)
+		if (getType() == EMPTY && getState() == MOVABLE ||
+			getType() != b.getLogic().getCurrentPlayer() && getType() != EMPTY)
 			for (int x = 0; x < 6; x++)
 				if (getSurr(x) != null)
 					if (getSurr(x).getState() == SELECTED &&
