@@ -71,11 +71,7 @@ public class Board extends Pane implements Constants{
 		
 		/* Resize the window */
 		resize(WINDOW_SIZE, WINDOW_SIZE);
-		/*getLogic().setWinner(EMPTY);
-		getLogic().setCurrentPlayer(BLACK);
-		getLogic().setNumPizSelected(0);
-		a.getTimer().reset();
-		*/
+		
 		if (getLogic().getCurrentPlayer() != BLACK)
 			getLogic().setCurrentPlayer(BLACK);
 		else {
@@ -101,12 +97,9 @@ public class Board extends Pane implements Constants{
 	public void resize(final double width, final double height) {
 		super.resize(width, height);
 		
-		//System.out.println("board resize() call"); 
-		
 		/* CellControl Positions are based on my calculation 
 		 * do not care about how they come from, Just trust them :) */
 		subS = stage.getWidth()* Math.sqrt(3.0)/27;
-		//System.out.println(stage.getWidth());
 		
 		hexagon.getPoints().setAll(makeVertices(stage.getWidth()/2, sides));
 				
