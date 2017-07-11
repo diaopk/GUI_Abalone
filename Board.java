@@ -88,11 +88,6 @@ public class Board extends Pane implements Constants{
 		return "-fx-effect: dropshadow(three-pass-box, #cccccc, 20, 0, 8, 8);";
 	}
 	
-	/* After a couple times of testing the program, I found that
-	 * the resize method runs twice since the whole program created 
-	 * (non-Javadoc)
-	 * @see javafx.scene.layout.Region#resize(double, double)
-	 */
 	@Override
 	public void resize(final double width, final double height) {
 		super.resize(width, height);
@@ -139,6 +134,8 @@ public class Board extends Pane implements Constants{
 				
 				
 			} else { // If cell are not null
+				
+				/* Make a right position for pieces */
 				cc[i][j].setRotate(90);
 				cc[i][j].resize(0, 0);
 				cc[i][j].relocate(subS*Math.sqrt(3.0)*j, subS*i*3/2);

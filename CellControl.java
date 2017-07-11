@@ -26,7 +26,9 @@ public class CellControl extends Control implements Constants{
 	
 	/* Each piece is identified by type and state
 	 * if one of these value changes there will be 
-	 * changes to its corresponding values
+	 * changes to its corresponding values.
+	 * type is the player
+	 * state is one of selected, unselected, movable.
 	 */
 	private IntegerProperty type, state;
 	
@@ -115,14 +117,13 @@ public class CellControl extends Control implements Constants{
 
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				// TODO Auto-generated method stub
 				/* oldValue is previous type */
 				/* newValue is new type */
 				setAttributes((int)newValue, getState());
 				/*System.out.println("Type: "+getType()+"| old: "+oldValue);
 				System.out.println("         new: "+newValue+"\n");
 				/* I need to check pieces if they meet to be pushable below*/
-				checkPieceForPush((int)newValue);
+				//checkPieceForPush((int)newValue);
 			}
 			
 		});
@@ -138,6 +139,8 @@ public class CellControl extends Control implements Constants{
 			}
 			
 		});
+		
+		/************ End of Events ***************/
 	
 	}
 	
@@ -166,12 +169,12 @@ public class CellControl extends Control implements Constants{
 						/* getSurr(x) is the most surrounding-selected piece */
 						
 						if (b.getLogic().numPizSelected() == 1) { // One piece movement
+							if (getType() == EMPTY) {
 							setType(getSurr(x).getType());
 							getSurr(x).setType(EMPTY);
-							getSurr(x).setState(UNSELECTED);
-							setState(UNSELECTED);
+							
 							b.getLogic().nextPlayer(getType());
-						
+							}
 						} else if (b.getLogic().numPizSelected() == 2) { // Two pieces' movement and push
 							/* If the surrounding piece is selected and is not null */
 							if (getSurr(x).selectedPiece(0) != null)
@@ -182,7 +185,6 @@ public class CellControl extends Control implements Constants{
 									 * and that surrounding piece's surrounding is also selected
 									 * and these two surrounding are the same direction with this cell
 									 */
-
 									
 									if (selectedPizPos(0) == getSurr(x).selectedPizPos(0)) {
 										/* Two-pieces straight movement or push */
@@ -194,18 +196,36 @@ public class CellControl extends Control implements Constants{
 										CellControl piece2 = getSurr(x).selectedPiece(0);
 										
 										if (getType() == EMPTY) { // Move!
-											System.out.println(getType());
+											//System.out.println(getType());
 											setType(piece1.getType());
 											piece1.setType(getSurr(x).selectedPiece(0).getType());
 											piece2.setType(EMPTY);
 											
-											piece2.setState(UNSELECTED);
-											piece1.setState(UNSELECTED);
-											setState(UNSELECTED);
 											b.getLogic().nextPlayer(getType());
 											
 										} else { // Push!
-											System.out.println("get it");
+											int opposite = opposite(x);
+											
+											if (getSurr(opposite) != null) {
+												System.out.println("two piece - push");
+												if (getSurr(opposite).getType() == EMPTY) {
+													getSurr(opposite).setType(getType());
+													setType(getSurr(x).getType());
+													getSurr(x).getSurr(x).setType(EMPTY);
+													
+													b.getLogic().nextPlayer(getType());
+												}
+											} else {
+												System.out.println("two piece - push out");
+												b.getLogic().changeCountPiece(getType());
+												
+												setType(getSurr(x).getType());
+												getSurr(x).setType(getSurr(x).getSurr(x).getType());
+												getSurr(x).getSurr(x).setType(EMPTY);
+												
+												b.getLogic().nextPlayer(getType());
+											}
+											
 										}
 									
 									} else { // If the two surrounding pieces are not straight with this object
@@ -224,31 +244,88 @@ public class CellControl extends Control implements Constants{
 											cell[getSurr(x).selectedPizPos(0)].get().setType(getSurr(x).selectedPiece(0).getType());
 											getSurr(x).setType(EMPTY);
 											getSurr(x).selectedPiece(0).setType(EMPTY);
-											
+								
 											b.getLogic().nextPlayer(getType());
 										
 										}
 									}
-						} else { // Three pieces movement
+						} else if (b.getLogic().numPizSelected() == 3) { // Three pieces movement and push
 							if (getSurr(x).selectedPiece(0) != null)
 								/*
 								 * (selectedPizPos(0) == getSurr(x).selectedPizPos(0) means that
 								 * if this and three selected pieces are form one line.
 								 */
-								if (selectedPizPos(0) == getSurr(x).selectedPizPos(0) &
+								if (selectedPizPos(0) == getSurr(x).selectedPizPos(0) &&
 										getSurr(x).selectedPizPos(0) == getSurr(x).selectedPiece(0).selectedPizPos(0, getSurr(x))) {
 									
-									setType(getSurr(x).getType());
+									/* Three pieces movement */
+									if (getType() == EMPTY) {
+										setType(getSurr(x).getType());
+										
+										getSurr(x).setType(getSurr(x).selectedPiece(0).getType());
+										
+										getSurr(x).getSurr(getSurr(x).selectedPizPos(0)).setType(getSurr(x).selectedPiece(0).selectedPiece(0).getType());
 									
-									getSurr(x).setType(getSurr(x).selectedPiece(0).getType());
-									getSurr(x).setState(UNSELECTED);
+										getSurr(x).selectedPiece(0).selectedPiece(0, getSurr(x)).setType(EMPTY);
+										
+										b.getLogic().nextPlayer(getType());
 									
-									getSurr(x).getSurr(getSurr(x).selectedPizPos(0)).setType(getSurr(x).selectedPiece(0).selectedPiece(0).getType());
-								
-									getSurr(x).selectedPiece(0).selectedPiece(0).setType(EMPTY);
+									/* Three pieces push */
+									} else if (getType() != EMPTY && getType() != b.getLogic().getCurrentPlayer()) {
+										System.out.println("get it");
+										int opposite = opposite(x);
+										
+										/* One piece push out */
+										if (getSurr(opposite) == null) {
+											System.out.println("Three pieces - one piece push out");
+											b.getLogic().changeCountPiece(getType());
+											
+											setType(getSurr(x).getType());
+											getSurr(x).getSurr(x).setType(getSurr(x).getType());
+											getSurr(x).getSurr(x).getSurr(x).setType(EMPTY);
+											
+											b.getLogic().nextPlayer(getType());
+										
+										/* one piece push */
+										} else if (getSurr(opposite).getType() == EMPTY) {
+											System.out.println("Three pieces - one piece push");
+											
+											getSurr(opposite).setType(getType());
+											setType(getSurr(x).getType());
+											getSurr(x).getSurr(x).setType(getSurr(x).getType());
+											getSurr(x).getSurr(x).getSurr(x).setType(EMPTY);
+											
+											b.getLogic().nextPlayer(getType());
+											
+										/* Tow pieces push */	
+										} else if (getSurr(opposite).getType() == getType()) {
+											if (getSurr(opposite).getSurr(opposite) == null) {
+												System.out.println("Three pieces - two pieces push out");
+												b.getLogic().changeCountPiece(getType());
+												
+												getSurr(opposite).setType(getType());
+												setType(getSurr(x).getType());
+												getSurr(x).setType(getSurr(x).getSurr(x).getType());
+												getSurr(x).getSurr(x).setType(getSurr(x).getSurr(x).getSurr(x).getType());
+												getSurr(x).getSurr(x).getSurr(x).setType(EMPTY);
+												
+												b.getLogic().nextPlayer(getType());
+												
+											} else if (getSurr(opposite).getSurr(opposite).getType() == EMPTY) {
+												System.out.println("Three pieces - two pieces push");
+												
+												getSurr(opposite).getSurr(opposite).setType(getSurr(opposite).getType());
+												getSurr(opposite).setType(getType());
+												setType(getSurr(x).getType());
+												getSurr(x).setType(getSurr(x).getSurr(x).getType());
+												getSurr(x).getSurr(x).setType(getSurr(x).getSurr(x).getSurr(x).getType());
+												getSurr(x).getSurr(x).getSurr(x).setType(EMPTY);
+												
+												b.getLogic().nextPlayer(getType());
+											}
+										}
+									}
 									
-									b.getLogic().nextPlayer(getType());
-								
 								/* If the cell to move does not form a line with those three pieces */
 								} else if (selectedPizPos(0) != getSurr(x).selectedPizPos(0)) {
 									/*
@@ -256,7 +333,7 @@ public class CellControl extends Control implements Constants{
 									 * So we need to find out the index(or position) of the selectedPiece(0)
 									 */
 									/* Target position and current player */
-									int target = reverse(selectedPizPos(0));
+									int target = opposite(selectedPizPos(0));
 									int currentPlayer = b.getLogic().getCurrentPlayer();
 									
 									/* Condition 1 and 2 */
@@ -315,7 +392,7 @@ public class CellControl extends Control implements Constants{
 					}
 	}
 	
-	/********** FOLLOWING FOUR METHODS FOR ASSISTING IN MOVEMENTS **********/
+	/********** FOLLOWING FOUR METHODS FOR ASSISTING IN MOVEMENTS and PUSH **********/
 	
 	/* Private method to return surrounding selected piece */
 	private CellControl selectedPiece(int index) {
@@ -336,6 +413,7 @@ public class CellControl extends Control implements Constants{
 			return null;
 	}
 	
+	/* Private method to return the surrounding selected piece but not return the c */
 	private CellControl selectedPiece(int index, CellControl c) {
 		if (index != 6) {
 			if (this.getSurr(index) != null)
@@ -370,7 +448,7 @@ public class CellControl extends Control implements Constants{
 	}
 	
 	/* Private method to return surrounding selected piece's position */
-	/* This method bascially is similar to the previous one 
+	/* This method basically is similar to the previous one 
 	 * Except it takes the CellControl as an argument for checking ...
 	 */
 	private int selectedPizPos(int index, CellControl c) {
@@ -384,7 +462,8 @@ public class CellControl extends Control implements Constants{
 			return -1;
 	}
 	
-	private int reverse(int index) {
+	/* Private method to return the opposite position based on the index agrument */
+	private int opposite(int index) {
 		if (index == 0)
 			return 3;
 		else if (index == 1)
@@ -409,26 +488,8 @@ public class CellControl extends Control implements Constants{
 				b.getLogic().numPizSelected() < 3)
 				setState(SELECTED);
 		
-			/* set to pushable */
-			/* If this cell's surrounding piece is the selected and 
-			 * that selected piece has another selected surrounding it with 
-			 * the same type, then check this whether it is empty of type. 
-			 * if so check for it's piece behind it . if is empty type then we
-			 * can set this cell to pushable state
-			 */
-			/*else if (getType() != b.getLogic().getCurrentPlayer() &&
-					getType() != EMPTY) {
-				System.out.println("first step");
-				if (b.getLogic().numPizSelected() == 2)
-					if (selectedPiece(0) != null)
-						if (selectedPiece(0).selectedPiece(0) != null)
-							if (selectedPizPos(0) == selectedPiece(0).selectedPizPos(0) &&
-							getSurr(reverse(selectedPizPos(0))).getType() == EMPTY)
-								setState(PUSHABLE);
-				}
-		
 			/* Set to unselected */
-			else if (getState() == SELECTED )
+			else if (getState() == SELECTED)
 				setState(UNSELECTED);
 				
 	}
@@ -516,69 +577,6 @@ public class CellControl extends Control implements Constants{
 			
 		else // This object is set to selected
 			return true;
-	}
-	
-	/* Method to check pieces if they meet the requirement to be pushable */
-	/* There are basically 4 conditions to be considered */
-	public void checkPieceForPush(int newType) {
-		if (newType != EMPTY) {
-			//System.out.println("They in");
-			
-			for (int x = 0; x < 6; x++)
-				/* getSurr(x) is the current player */
-				/* getSurr(reverse(x)) is the oppsite player */
-				if (getSurr(x) != null)
-					if (getSurr(x).getSurr(x) != null)
-					/* Condition 1.1 - two piece push 
-					 * Condition 1.2 - three pieces push 
-					 */
-					/* Condition 1.2 */
-					if (getSurr(x).getType() == getType() && getSurr(x).getSurr(x).getType() == getType()) { // make sure 3 pieces
-						//System.out.println("make sure 3 pieces");
-						if (getSurr(reverse(x)) != null) // push 1
-							if (getSurr(reverse(x)).getType() != EMPTY &&
-								getSurr(reverse(x)).getType() != b.getLogic().getCurrentPlayer())
-								if (getSurr(reverse(x)).getSurr(reverse(x)) != null) {
-									if (getSurr(reverse(x)).getSurr(reverse(x)).getType() == getSurr(reverse(x)).getType()) {
-										if (getSurr(reverse(x)).getSurr(reverse(x)).getSurr(reverse(x)) == null) {
-											System.out.println("condition 1.2.1 - two pieces push out");
-											getSurr(reverse(x)).setState(PUSHABLE);
-											getSurr(reverse(x)).getSurr(reverse(x)).setState(PUSHABLE);
-										} else if (getSurr(reverse(x)).getSurr(reverse(x)).getSurr(reverse(x)).getType() == EMPTY) {
-											System.out.println("Condition 1.2.1");
-											getSurr(reverse(x)).setState(PUSHABLE);
-											getSurr(reverse(x)).getSurr(reverse(x)).setState(PUSHABLE);
-										}
-									} else if (getSurr(reverse(x)).getSurr(reverse(x)).getType() == EMPTY) {
-										System.out.println("condition 1.2.2 - one piece");
-										getSurr(reverse(x)).setState(PUSHABLE);
-									}
-								} else {
-									System.out.println("Condition 1.2.2 - one piece push out");
-									getSurr(reverse(x)).setState(PUSHABLE);
-								}
-					/* End of Condition 1.2 */
-					/* Condition 1.1 */
-					} else if (getSurr(x).getType() == getType()) {
-						if (getSurr(reverse(x)) != null)
-							if (getSurr(reverse(x)).getType() != EMPTY &&
-								getSurr(reverse(x)).getType() != b.getLogic().getCurrentPlayer())
-								if (getSurr(reverse(x)).getSurr(reverse(x)) == null) {
-									System.out.println("condition 1.1 - one piece push out");
-									getSurr(reverse(x)).setState(PUSHABLE);
-								} else if (getSurr(reverse(x)).getSurr(reverse(x)).getType() == EMPTY) {
-									System.out.println("condition 1.1");
-									getSurr(reverse(x)).setState(PUSHABLE);
-								}
-					}
-					/* End of Condition 1.1 */
-						
-		/* new type is empty
-		 * means that there were non-empty pieces but now they are gone
-		 */
-		} else {
-			//System.out.println("They gone");
-		}
 	}
 
 	/* Method to change the number of selected piece

@@ -30,20 +30,14 @@ public class Piece extends Group implements Constants{
 		switch (type.get()) {
 			case EMPTY:
 				c.setFill(Color.PINK);
-				//c.setStroke(Color.BLACK);
-				//this.setPizHoverColor(Color.web("#ff99aa"), Color.PINK);
 				break;
 				
 			case BLACK: // Player black
 				c.setFill(Color.BLACK);
-				//c.setStroke(Color.WHITE);
-				//this.setPizHoverColor(Color.gray(0.3), Color.BLACK);
 				break;
 				
 			case WHITE: // Player white
 				c.setFill(Color.WHITE);
-				//c.setStroke(Color.BLACK);
-				//this.setPizHoverColor(Color.gray(0.75), Color.WHITE);
 				break;
 				
 			default:
@@ -57,14 +51,6 @@ public class Piece extends Group implements Constants{
 		getChildren().add(c);
 		
 	}
-	
-	public Circle getCircle() { return c; }
-	
-	public IntegerProperty getTypeProperty() { return type; }
-	
-	public int getType() { return type.get(); }
-	
-	public void setType(int player) { type.set(player); }
 	
 	/* Method to change piece attributes 
 	 * when the piece's type changes on the where the cell's state changes */
@@ -90,58 +76,6 @@ public class Piece extends Group implements Constants{
 		}
 	}
 	
-	/* Method to set hover colour */
-	public void setPizHoverColor(Color hoverColor, Color origion) {
-		
-		c.hoverProperty().addListener(new ChangeListener<Object>() {
-			
-			public void changed(ObservableValue<? extends Object> observable, Object oldValue, Object newValue) {
-				if (c.isHover())
-					c.setFill(hoverColor);
-				else
-					c.setFill(origion);
-			}	
-		});
-
-	}
-	public void setPizHoverColor2(int type, int state) {
-		
-		
-		switch (type) {
-		case BLACK:
-			if (c.isHover())
-				c.setFill(Color.gray(0.3));
-			else
-				c.setFill(Color.BLACK);
-			break;
-		case WHITE: 
-			if (c.isHover())
-				c.setFill(Color.gray(0.75));
-			else
-				c.setFill(Color.WHITE);
-			
-			break;
-			
-		case EMPTY:
-			if (state == MOVABLE) {
-			if (c.isHover())
-				c.setFill(Color.DEEPPINK);
-			else
-				c.setFill(Color.HOTPINK);
-			} else {
-				if (c.isHover())
-					c.setFill(Color.web("#ff99aa"));
-				else
-					c.setFill(Color.PINK);
-			}
-			
-			break;
-			
-			default :
-				System.out.println("Invaild type for setPizHoverColor()");
-		}
-	}
-	
 	@Override
 	public void resize(double width, double height) {
 		super.resize(width, height);
@@ -152,7 +86,13 @@ public class Piece extends Group implements Constants{
 	@Override
 	public void relocate(double x, double y) {
 		super.relocate(x, y);
-		//c.relocate(x, y);
 	}
 	
+	public Circle getCircle() { return c; }
+	
+	public IntegerProperty getTypeProperty() { return type; }
+	
+	public int getType() { return type.get(); }
+	
+	public void setType(int player) { type.set(player); }
 }

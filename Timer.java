@@ -45,17 +45,6 @@ public class Timer extends Group implements Constants{
 		timeline.getKeyFrames().add(
 				new KeyFrame(Duration.seconds(STARTTIME+1),
 						new KeyValue(timeSeconds, 0)));
-
-		/*timeSeconds.addListener(new ChangeListener<Number>() {
-
-			@Override
-			public void changed(ObservableValue<? extends Number> arg0, Number oldVlaue, Number newValue) {
-				// TODO Auto-generated method stub
-				System.out.println(arg0);
-				//timerLabel.textProperty().bind();
-			}
-			
-		});*/
 		
 		// this method execute when the timer is finished    
 		timeline.setOnFinished(new EventHandler<ActionEvent>() {

@@ -52,7 +52,28 @@ public class GameLogic implements Constants{
 				setBarState();
 				
 				/* Reset the timer */
-				b.abalone().getTimer().reset();//b.abalone().getTimer().reset();
+				board.abalone().getTimer().reset();//b.abalone().getTimer().reset();
+			}
+			
+		});
+		
+		/* When the number of piece changes */
+		countBlack.addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0, Number arg1, Number arg2) {
+				// TODO Auto-generated method stub
+				setBarState();
+			}
+			
+		});
+		
+		countWhite.addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				// TODO Auto-generated method stub
+				setBarState();
 			}
 			
 		});
@@ -78,15 +99,12 @@ public class GameLogic implements Constants{
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// TODO Auto-generated method stub
 				if (winner.get() != EMPTY) {
-					b.abalone().hb().getChildren().add(new Label(winner(getWinner())));
-					b.abalone().getTimer().pause();
+					board.abalone().hb().getChildren().add(new Label(winner(getWinner())));
+					board.abalone().getTimer().pause();
 				}
 			}
 			
 		});
-		
-		//countWhite.addListener(new ChangeListener(WHITE, countWhite.get(), this));
-		//countBlack.addListener(new ChangeListener(BLACK, countBlack.get(), this));
 	}
 	
 	/* Method to set current_player to next player */
@@ -124,7 +142,7 @@ public class GameLogic implements Constants{
 	/* Method to Set the number of selected pieces when pieces are selected */
 	public void setNumPizSelected(int number) {
 		if (number > 3 | number < 0)
-			System.out.println("Exceed the limit");
+			System.out.println("setNumPizSelected()");
 		else
 			num_piz_selected = number;
 	}
@@ -147,9 +165,28 @@ public class GameLogic implements Constants{
 			break;
 			
 		default:
-			System.out.println("Abalone Error!");
+			System.out.println("setBarState()");
 		}
 		
+	}
+	
+	/* Method to change the number of pieces */
+	public void changeCountPiece(int player) {
+		if (player == BLACK)
+			dropBlackPiece();
+		else if (player == WHITE) 
+			dropWhitePiece();
+	}
+	
+	public String winner(int player) {
+		switch (player) {
+			case BLACK:
+				return "Black";
+			case WHITE:
+				return "White";
+			default:
+				return "Error";
+		}
 	}
 	
 	public int getRound() { return round; }
@@ -174,24 +211,14 @@ public class GameLogic implements Constants{
 	
 	public void setCountWhite(int count) { countWhite.set(count); }
 	
-	public void dropBlackPiece() { countBlack.subtract(1); }
+	public void dropBlackPiece() { countBlack.set(countBlack.get()-1);}
 	
-	public void dropWhitePiece() { countWhite.subtract(1); }
+	public void dropWhitePiece() { countWhite.set(countWhite.get()-1);}
 	
 	public void setWinner(int value) { winner.set(value); }
 	
 	public int getWinner() { return winner.get(); }
-	
-	public String winner(int player) {
-		switch (player) {
-			case BLACK:
-				return "Black";
-			case WHITE:
-				return "White";
-			default:
-				return "Error";
-		}
-	}
+
 	
 }
 
