@@ -10,6 +10,10 @@ import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 /* This class sets up a game rule and calculates how a winner comes out */
+/* This class controls all the logic stuff
+ * like the number of pieces, setting the current player and the winner,
+ * everything on the status bar.
+ */
 
 public class GameLogic implements Constants{
 
@@ -58,6 +62,7 @@ public class GameLogic implements Constants{
 		});
 		
 		/* When the number of piece changes */
+		/* When the number of pieces changes, status bar need to be updated as well */
 		countBlack.addListener(new ChangeListener<Number>() {
 
 			@Override
@@ -84,6 +89,7 @@ public class GameLogic implements Constants{
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
+				// Reset the game when the button is clicked */
 				board.reset();
 			}
 			
@@ -218,33 +224,5 @@ public class GameLogic implements Constants{
 	public void setWinner(int value) { winner.set(value); }
 	
 	public int getWinner() { return winner.get(); }
-
-	
-}
-
-/* Class to generate a winner */
-class CountChangeListener implements ChangeListener<Number>, Constants {
-
-	private int count;
-	private int player;
-	private GameLogic gl;
-	
-	CountChangeListener(int p, int c, GameLogic g) {
-		count = c;
-		gl = g;
-		player = p;
-	}
-	
-	@Override
-	public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-		// TODO Auto-generated method stub
-		if (count == 1) {
-			if (player == BLACK)
-				gl.setWinner(WHITE);
-			else
-				gl.setWinner(BLACK);
-	
-		}	
-	}
 	
 }
